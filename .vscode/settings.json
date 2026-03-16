@@ -1,0 +1,19 @@
+{
+  "terminal.integrated.env.windows": {
+    "PATH": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;${env:Path}"
+},
+"chat.tools.terminal.autoApprove": {
+    "cmake": true,
+    "Get-Command": true,
+    "where.exe": true,
+    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"\n& \\$cmake --build E:\\\\workSpace\\\\RayTracing\\\\build --config Release\nWrite-Host \"Build exit=\\$LASTEXITCODE\"$/": {
+        "approve": true,
+        "matchCommandLine": true
+    },
+    "&": true,
+    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"; & \\$cmake -S E:\\\\workSpace\\\\RayTracing -B E:\\\\workSpace\\\\RayTracing\\\\build; & \\$cmake --build E:\\\\workSpace\\\\RayTracing\\\\build --config Debug$/": {
+        "approve": true,
+        "matchCommandLine": true
+    }
+}
+}

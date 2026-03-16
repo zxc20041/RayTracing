@@ -1,0 +1,5 @@
+build/
+vcpkg/
+image.ppm
+*.ppm
+.vs/
