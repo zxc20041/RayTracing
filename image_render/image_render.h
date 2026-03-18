@@ -41,6 +41,12 @@ image_spec image4_spec();
 // Fills one scanline of the pixel buffer for image4.
 void fill_image4_scanline(int j, int image_width, int image_height, std::vector<uint8_t>& pixels);
 
+// Returns the default render setup for image5.
+image_spec image5_spec();
+
+// Fills one scanline of the pixel buffer for image5.
+void fill_image5_scanline(int j, int image_width, int image_height, std::vector<uint8_t>& pixels);
+
 } // namespace image_render
 
 #endif

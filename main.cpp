@@ -107,8 +107,7 @@ app_action render_image(
 } // namespace
 
 int main(int argc, char* argv[]) {
-    (void)argc;
-    (void)argv;
+
 
     const auto& renderers = image_render::get_renderers();
     int current_renderer = static_cast<int>(renderers.size()) - 1;
