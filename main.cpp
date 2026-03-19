@@ -1,4 +1,4 @@
-#include "image_render/image_render.h"
+﻿#include "image_render/image_render.h"
 
 #include <cstdint>
 #include <iostream>
@@ -70,11 +70,17 @@ app_action render_image(
     SDL_Texture*& texture,
     const image_render::render_entry& entry,
     std::vector<uint8_t>& pixels) {
-    const auto spec = entry.spec();
-    const auto aspect_ratio = spec.aspect_ratio;
-    const int image_width = spec.image_width;
-    int image_height = int(image_width / aspect_ratio);
-    image_height = (image_height < 1) ? 1 : image_height;
+    auto scene = entry.create_scene();
+    if (!scene.world) {
+        std::cerr << "Renderer has no valid world: " << entry.name << '\n';
+        return app_action::quit;
+    }
+
+    scene.cam.set_ray_color_fn(scene.ray_color);
+    scene.cam.begin_render();
+
+    const int image_width = scene.cam.image_width;
+    const int image_height = scene.cam.image_height();
 
     if (!ensure_texture(window, renderer, texture, image_width, image_height)) {
         std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << '\n';
@@ -92,7 +98,7 @@ app_action render_image(
             return action;
         }
 
-        entry.fill_scanline(j, image_width, image_height, pixels);
+        scene.cam.fill_scanline(j, *scene.world, pixels);
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), image_width * 3);
         SDL_RenderClear(renderer);
@@ -107,25 +113,29 @@ app_action render_image(
 } // namespace
 
 int main(int argc, char* argv[]) {
-
+    (void)argc;
+    (void)argv;
 
     const auto& renderers = image_render::get_renderers();
+    if (renderers.empty()) {
+        std::cerr << "No renderer registered.\n";
+        return 1;
+    }
+
     int current_renderer = static_cast<int>(renderers.size()) - 1;
 
-    // SDL2 init
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << '\n';
         return 1;
     }
 
-    const auto initial_spec = renderers[current_renderer].spec();
-    int initial_height = int(initial_spec.image_width / initial_spec.aspect_ratio);
-    initial_height = (initial_height < 1) ? 1 : initial_height;
+    auto initial_scene = renderers[current_renderer].create_scene();
+    initial_scene.cam.begin_render();
 
     SDL_Window* window = SDL_CreateWindow(
         "RayTracing",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        initial_spec.image_width, initial_height, 0);
+        initial_scene.cam.image_width, initial_scene.cam.image_height(), 0);
     if (!window) {
         std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << '\n';
         SDL_Quit();
