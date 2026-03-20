@@ -26,6 +26,7 @@ add_executable(RT_Demo
     image_render/image5.cpp
     image_render/image6.cpp
     image_render/image6-2.cpp
+    image_render/image7.cpp
 )
 
 target_include_directories(RT_Demo PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

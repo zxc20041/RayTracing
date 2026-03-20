@@ -1,9 +1,8 @@
 ﻿#ifndef CAMERA_H
 #define CAMERA_H
 
-#include "hittable.h"
-#include "color.h"
 #include "rtweekend.h"
+#include "hittable.h"
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -132,7 +131,7 @@ class camera {
 
     vec3 sample_square() const {
         // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
-        return vec3(random_double() - 0.5, random_double() - 0.5, 0);
+        return vec3(random_float() - 0.5, random_float() - 0.5, 0);
     }
 };
 
