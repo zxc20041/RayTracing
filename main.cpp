@@ -98,7 +98,12 @@ app_action render_image(
             return action;
         }
 
-        scene.cam.fill_scanline(j, *scene.world, pixels);
+        // Use custom fill_scanline if provided, otherwise use camera's default
+        if (scene.fill_scanline_override) {
+            scene.fill_scanline_override(j, *scene.world, pixels, scene);
+        } else {
+            scene.cam.fill_scanline(j, *scene.world, pixels);
+        }
 
         SDL_UpdateTexture(texture, nullptr, pixels.data(), image_width * 3);
         SDL_RenderClear(renderer);

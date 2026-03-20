@@ -68,6 +68,32 @@ class camera {
         std::clog << "\rDone.                 \n";
     }
 
+    // Public methods for custom rendering logic
+    ray get_ray(float i, float j, bool jitter = true) const {
+        // Build a camera ray for pixel-space coordinate (i, j).
+        auto offset = jitter ? sample_square() : vec3(0.0f, 0.0f, 0.0f);
+        auto pixel_sample = pixel00_loc
+                          + ((i + offset.x()) * pixel_delta_u)
+                          + ((j + offset.y()) * pixel_delta_v);
+
+        auto ray_origin = center;
+        auto ray_direction = pixel_sample - ray_origin;
+
+        return ray(ray_origin, ray_direction);
+    }
+
+    ray get_ray(int i, int j) const {
+        return get_ray(static_cast<float>(i), static_cast<float>(j), true);
+    }
+
+    color shade(const ray& r, const hittable& world) const {
+        if (shade_fn) {
+            return shade_fn(r, world);
+        }
+
+        return default_ray_color(r, world);
+    }
+
   private:
     int image_height_value = 1;
     float pixel_samples_scale;  // Color scale factor for a sum of pixel samples
@@ -81,14 +107,6 @@ class camera {
         vec3 unit_direction = unit_vector(r.direction());
         auto a = 0.5f * (unit_direction.y() + 1.0f);
         return (1.0f - a) * color(1.0f, 1.0f, 1.0f) + a * color(0.5f, 0.7f, 1.0f);
-    }
-
-    color shade(const ray& r, const hittable& world) const {
-        if (shade_fn) {
-            return shade_fn(r, world);
-        }
-
-        return default_ray_color(r, world);
     }
 
     void initialize() {
@@ -110,21 +128,6 @@ class camera {
 
         auto viewport_upper_left = center - vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
         pixel00_loc = viewport_upper_left + 0.5f * (pixel_delta_u + pixel_delta_v);
-    }
-
-    ray get_ray(int i, int j) const {
-        // Construct a camera ray originating from the origin and directed at randomly sampled
-        // point around the pixel location i, j.
-
-        auto offset = sample_square();
-        auto pixel_sample = pixel00_loc
-                          + ((i + offset.x()) * pixel_delta_u)
-                          + ((j + offset.y()) * pixel_delta_v);
-
-        auto ray_origin = center;
-        auto ray_direction = pixel_sample - ray_origin;
-
-        return ray(ray_origin, ray_direction);
     }
 
     vec3 sample_square() const {
