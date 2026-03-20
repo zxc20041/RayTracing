@@ -26,6 +26,12 @@ class interval {
         return min < x && x < max;
     }
 
+    float clamp(float x) const {
+        if (x < min) return min;
+        if (x > max) return max;
+        return x;
+    }
+
     static const interval empty;
     static const interval universe;
 };

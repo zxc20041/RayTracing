@@ -27,6 +27,7 @@ render_scene create_image2_scene();
 render_scene create_image3_scene();
 render_scene create_image4_scene();
 render_scene create_image5_scene();
+render_scene create_image6_scene();
 
 } // namespace image_render
 

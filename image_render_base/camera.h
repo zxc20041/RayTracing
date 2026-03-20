@@ -3,7 +3,7 @@
 
 #include "hittable.h"
 #include "color.h"
-
+#include "rtweekend.h"
 #include <cstdint>
 #include <iostream>
 #include <vector>
@@ -12,8 +12,9 @@ class camera {
   public:
     using ray_color_fn = color (*)(const ray&, const hittable&);
 
-    float aspect_ratio = 1.0f;
-    int image_width = 100;
+    float  aspect_ratio = 1.0f;
+    int    image_width = 100;
+    int    samples_per_pixel = 10;   // Count of random samples for each pixel
 
     void set_ray_color_fn(ray_color_fn fn) {
         shade_fn = fn;
@@ -29,16 +30,19 @@ class camera {
 
     void fill_scanline(int j, const hittable& world, std::vector<uint8_t>& pixels) const {
         for (int i = 0; i < image_width; i++) {
-            auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-            auto ray_direction = pixel_center - center;
-            ray r(center, ray_direction);
+            color pixel_color(0.0f, 0.0f, 0.0f);
+            for (int sample = 0; sample < samples_per_pixel; sample++) {
+                ray r = get_ray(i, j);
+                pixel_color += shade(r, world);
+            }
 
-            color pixel_color = shade(r, world);
+            pixel_color *= pixel_samples_scale;
 
+            static const interval intensity(0.000f, 0.999f);
             int idx = (j * image_width + i) * 3;
-            pixels[idx + 0] = static_cast<uint8_t>(255.999f * pixel_color.x());
-            pixels[idx + 1] = static_cast<uint8_t>(255.999f * pixel_color.y());
-            pixels[idx + 2] = static_cast<uint8_t>(255.999f * pixel_color.z());
+            pixels[idx + 0] = static_cast<uint8_t>(256.0f * intensity.clamp(pixel_color.x()));
+            pixels[idx + 1] = static_cast<uint8_t>(256.0f * intensity.clamp(pixel_color.y()));
+            pixels[idx + 2] = static_cast<uint8_t>(256.0f * intensity.clamp(pixel_color.z()));
         }
     }
 
@@ -50,11 +54,13 @@ class camera {
         for (int j = 0; j < image_height_value; j++) {
             std::clog << "\rScanlines remaining: " << (image_height_value - j) << ' ' << std::flush;
             for (int i = 0; i < image_width; i++) {
-                auto pixel_center = pixel00_loc + (i * pixel_delta_u) + (j * pixel_delta_v);
-                auto ray_direction = pixel_center - center;
-                ray r(center, ray_direction);
+                color pixel_color(0.0f, 0.0f, 0.0f);
+                for (int sample = 0; sample < samples_per_pixel; sample++) {
+                    ray r = get_ray(i, j);
+                    pixel_color += shade(r, world);
+                }
 
-                color pixel_color = shade(r, world);
+                pixel_color *= pixel_samples_scale;
                 write_color(std::cout, pixel_color);
             }
         }
@@ -64,6 +70,7 @@ class camera {
 
   private:
     int image_height_value = 1;
+    float pixel_samples_scale;  // Color scale factor for a sum of pixel samples
     point3 center;
     point3 pixel00_loc;
     vec3 pixel_delta_u;
@@ -87,6 +94,7 @@ class camera {
     void initialize() {
         image_height_value = int(image_width / aspect_ratio);
         image_height_value = (image_height_value < 1) ? 1 : image_height_value;
+        pixel_samples_scale = 1.0 / samples_per_pixel;
 
         center = point3(0, 0, 0);
 
@@ -102,6 +110,26 @@ class camera {
 
         auto viewport_upper_left = center - vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
         pixel00_loc = viewport_upper_left + 0.5f * (pixel_delta_u + pixel_delta_v);
+    }
+
+    ray get_ray(int i, int j) const {
+        // Construct a camera ray originating from the origin and directed at randomly sampled
+        // point around the pixel location i, j.
+
+        auto offset = sample_square();
+        auto pixel_sample = pixel00_loc
+                          + ((i + offset.x()) * pixel_delta_u)
+                          + ((j + offset.y()) * pixel_delta_v);
+
+        auto ray_origin = center;
+        auto ray_direction = pixel_sample - ray_origin;
+
+        return ray(ray_origin, ray_direction);
+    }
+
+    vec3 sample_square() const {
+        // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
+        return vec3(random_double() - 0.5, random_double() - 0.5, 0);
     }
 };
 

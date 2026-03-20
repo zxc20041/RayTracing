@@ -18,6 +18,13 @@
     "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"; & \\$cmake -S \\. -B build; & \\$cmake --build build --config Debug$/": {
         "approve": true,
         "matchCommandLine": true
+    },
+    "Test-Path": true,
+    "Move-Item": true,
+    "Set-Content": true,
+    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"; & \\$cmake --build build --config Debug$/": {
+        "approve": true,
+        "matchCommandLine": true
     }
 }
 }
