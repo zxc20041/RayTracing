@@ -11,7 +11,7 @@ namespace {
 
 using color = vec3;
 
-color image13_ray_color(const ray& r, const hittable& world, int depth) {
+color image14_ray_color(const ray& r, const hittable& world, int depth) {
     // If we've exceeded the ray bounce limit, no more light is gathered.
     if (depth <= 0)
         return color(0.0f, 0.0f, 0.0f);
@@ -20,7 +20,7 @@ color image13_ray_color(const ray& r, const hittable& world, int depth) {
         ray scattered;
         color attenuation;
         if (rec.mat->scatter(r, rec, attenuation, scattered))
-            return attenuation * image13_ray_color(scattered, world, depth-1);
+            return attenuation * image14_ray_color(scattered, world, depth-1);
         return color(0.0f, 0.0f, 0.0f);
     }
 
@@ -31,7 +31,7 @@ color image13_ray_color(const ray& r, const hittable& world, int depth) {
 
 } // namespace
 
-render_scene create_image13_scene() {
+render_scene create_image14_scene() {
     render_scene scene;
     scene.cam.aspect_ratio = 16.0f / 9.0f;
     scene.cam.image_width = 800;
@@ -43,8 +43,8 @@ render_scene create_image13_scene() {
 
     auto material_ground = make_shared<lambertian>(color(0.8f, 0.8f, 0.0f));
     auto material_center = make_shared<lambertian>(color(0.1f, 0.2f, 0.5f));
-    auto material_left   = make_shared<metal>(color(0.8f, 0.8f, 0.8f));
-    auto material_right  = make_shared<metal>(color(0.8f, 0.6f, 0.2f));
+    auto material_left   = make_shared<metal>(color(0.8f, 0.8f, 0.8f), 0.3f);
+    auto material_right  = make_shared<metal>(color(0.8f, 0.6f, 0.2f), 1.0f);
 
     world->add(make_shared<sphere>(point3( 0.0f, -100.5f, -1.0f), 100.0f, material_ground));
     world->add(make_shared<sphere>(point3( 0.0f,    0.0f, -1.2f),   0.5f, material_center));
@@ -53,13 +53,13 @@ render_scene create_image13_scene() {
 
     scene.world = world;
     scene.ray_color = nullptr;
-    scene.ray_color_with_depth = image13_ray_color;
+    scene.ray_color_with_depth = image14_ray_color;
     return scene;
 }
 
 namespace {
 struct auto_reg_t {
-    auto_reg_t() { register_renderer({"image13", create_image13_scene}); }
+    auto_reg_t() { register_renderer({"image14", create_image14_scene}); }
 } auto_reg;
 } // namespace
 
