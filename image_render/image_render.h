@@ -14,6 +14,7 @@ struct render_scene {
     camera cam;
     std::shared_ptr<hittable> world;
     camera::ray_color_fn ray_color;
+    camera::ray_color_depth_fn ray_color_with_depth = nullptr;
     
     // Optional: custom fill_scanline implementation
     using fill_scanline_fn = void (*)(int j, const hittable&, std::vector<uint8_t>&, const render_scene&);
@@ -35,6 +36,9 @@ render_scene create_image5_scene();
 render_scene create_image6_scene();
 render_scene create_image6_2_scene();
 render_scene create_image7_scene();
+render_scene create_image8_scene();
+render_scene create_image9_scene();
+render_scene create_image10_scene();
 
 } // namespace image_render
 

@@ -76,7 +76,11 @@ app_action render_image(
         return app_action::quit;
     }
 
-    scene.cam.set_ray_color_fn(scene.ray_color);
+    if (scene.ray_color_with_depth) {
+        scene.cam.set_ray_color_fn(scene.ray_color_with_depth);
+    } else {
+        scene.cam.set_ray_color_fn(scene.ray_color);
+    }
     scene.cam.begin_render();
 
     const int image_width = scene.cam.image_width;
