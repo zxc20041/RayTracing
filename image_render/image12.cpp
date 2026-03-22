@@ -15,7 +15,7 @@ color image12_ray_color(const ray& r, const hittable& world, int depth) {
     if (depth <= 0)
         return color(0.0f, 0.0f, 0.0f);
     hit_record rec;
-    if (world.hit(r, interval(0.001, infinity), rec)) {
+    if (world.hit(r, interval(0.001f, infinity), rec)) {
         vec3 direction = rec.normal + random_unit_vector();
         return 0.5f * image12_ray_color(ray(rec.p, direction), world, depth - 1);
     }

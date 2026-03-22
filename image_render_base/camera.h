@@ -1,11 +1,12 @@
 ﻿#ifndef CAMERA_H
 #define CAMERA_H
 
-#include "rtweekend.h"
-#include "hittable.h"
 #include <cstdint>
 #include <iostream>
 #include <vector>
+#include "rtweekend.h"
+#include "hittable.h"
+#include "material.h"
 
 class camera {
   public:
