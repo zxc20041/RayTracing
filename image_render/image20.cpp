@@ -11,7 +11,7 @@ namespace {
 
 using color = vec3;
 
-color image19_ray_color(const ray& r, const hittable& world, int depth) {
+color image20_ray_color(const ray& r, const hittable& world, int depth) {
     // If we've exceeded the ray bounce limit, no more light is gathered.
     if (depth <= 0)
         return color(0.0f, 0.0f, 0.0f);
@@ -20,7 +20,7 @@ color image19_ray_color(const ray& r, const hittable& world, int depth) {
         ray scattered;
         color attenuation;
         if (rec.mat->scatter(r, rec, attenuation, scattered))
-            return attenuation * image19_ray_color(scattered, world, depth-1);
+            return attenuation * image20_ray_color(scattered, world, depth-1);
         return color(0.0f, 0.0f, 0.0f);
     }
 
@@ -31,7 +31,7 @@ color image19_ray_color(const ray& r, const hittable& world, int depth) {
 
 } // namespace
 
-render_scene create_image19_scene() {
+render_scene create_image20_scene() {
     render_scene scene;
     scene.cam.aspect_ratio = 16.0f / 9.0f;
     scene.cam.image_width = 800;
@@ -39,26 +39,33 @@ render_scene create_image19_scene() {
     scene.cam.max_depth         = 50;
     scene.cam.enable_gamma_correction = true;
     scene.cam.vfov = 90;
+    scene.cam.lookfrom = point3(-2,2,1);
+    scene.cam.lookat   = point3(0,0,-1);
+    scene.cam.vup      = vec3(0,1,0);
 
     auto world = std::make_shared<hittable_list>();
 
-    auto R = std::cos(pi/4);
+    auto material_ground = make_shared<lambertian>(color(0.8f, 0.8f, 0.0f));
+    auto material_center = make_shared<lambertian>(color(0.1f, 0.2f, 0.5f));
+    auto material_left   = make_shared<dielectric>(1.50f);
+    auto material_bubble = make_shared<dielectric>(1.00f / 1.50f);
+    auto material_right  = make_shared<metal>(color(0.8f, 0.6f, 0.2f), 1.0f);
 
-    auto material_left  = make_shared<lambertian>(color(0,0,1));
-    auto material_right = make_shared<lambertian>(color(1,0,0));
-
-    world->add(make_shared<sphere>(point3(-R, 0, -1), R, material_left));
-    world->add(make_shared<sphere>(point3( R, 0, -1), R, material_right));
+    world->add(make_shared<sphere>(point3( 0.0f, -100.5, -1.0f), 100.0f, material_ground));
+    world->add(make_shared<sphere>(point3( 0.0f,    0.0f, -1.2f),   0.5f, material_center));
+    world->add(make_shared<sphere>(point3(-1.0f,    0.0f, -1.0f),   0.5f, material_left));
+    world->add(make_shared<sphere>(point3(-1.0f,    0.0f, -1.0f),   0.4f, material_bubble));
+    world->add(make_shared<sphere>(point3( 1.0f,    0.0f, -1.0f),   0.5f, material_right));
 
     scene.world = world;
     scene.ray_color = nullptr;
-    scene.ray_color_with_depth = image19_ray_color;
+    scene.ray_color_with_depth = image20_ray_color;
     return scene;
 }
 
 namespace {
 struct auto_reg_t {
-    auto_reg_t() { register_renderer({"image19", create_image19_scene}); }
+    auto_reg_t() { register_renderer({"image20", create_image20_scene}); }
 } auto_reg;
 } // namespace
 
