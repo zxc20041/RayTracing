@@ -1,31 +1,14 @@
 {
   "terminal.integrated.env.windows": {
-    "PATH": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;${env:Path}"
+    "PATH": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin;${env:Path}"
 },
 "chat.tools.terminal.autoApprove": {
     "cmake": true,
     "Get-Command": true,
     "where.exe": true,
-    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"\n& \\$cmake --build E:\\\\workSpace\\\\RayTracing\\\\build --config Release\nWrite-Host \"Build exit=\\$LASTEXITCODE\"$/": {
-        "approve": true,
-        "matchCommandLine": true
-    },
-    "&": true,
-    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"; & \\$cmake -S E:\\\\workSpace\\\\RayTracing -B E:\\\\workSpace\\\\RayTracing\\\\build; & \\$cmake --build E:\\\\workSpace\\\\RayTracing\\\\build --config Debug$/": {
-        "approve": true,
-        "matchCommandLine": true
-    },
-    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"; & \\$cmake -S \\. -B build; & \\$cmake --build build --config Debug$/": {
-        "approve": true,
-        "matchCommandLine": true
-    },
     "Test-Path": true,
     "Move-Item": true,
     "Set-Content": true,
-    "/^\\$cmake = \"C:\\\\Program Files \\(x86\\)\\\\Microsoft Visual Studio\\\\2019\\\\Community\\\\Common7\\\\IDE\\\\CommonExtensions\\\\Microsoft\\\\CMake\\\\CMake\\\\bin\\\\cmake\\.exe\"; & \\$cmake --build build --config Debug$/": {
-        "approve": true,
-        "matchCommandLine": true
-    },
     ".\\build\\RT_Demo.exe": true
 }
 }
