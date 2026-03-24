@@ -19,6 +19,8 @@ class camera {
     int    max_depth         = 10;   // Maximum number of ray bounces into scene
     bool   enable_gamma_correction = false;
 
+    float vfov = 90;  // Vertical view angle (field of view)
+
     void set_ray_color_fn(ray_color_fn fn) {
         shade_fn = fn;
         shade_with_depth_fn = nullptr;
@@ -141,6 +143,10 @@ class camera {
         vec3 pixel_delta_v;
         ray_color_fn shade_fn = nullptr;
         ray_color_depth_fn shade_with_depth_fn = nullptr;
+        float focal_length = 1.0f;
+        float theta = degrees_to_radians(vfov);
+        float h = std::tan(theta/2);
+        float viewport_height = 2 * h * focal_length;
 
         static color default_ray_color(const ray& r, const hittable&) {
                 vec3 unit_direction = unit_vector(r.direction());
@@ -155,7 +161,7 @@ class camera {
 
         center = point3(0, 0, 0);
 
-        auto focal_length = 1.0f;
+        
         auto viewport_height = 2.0f;
         auto viewport_width = viewport_height * (static_cast<float>(image_width) / image_height_value);
 
