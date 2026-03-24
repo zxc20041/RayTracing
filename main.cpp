@@ -1,7 +1,10 @@
 ﻿#include "image_render/image_render.h"
 
 #include <cstdint>
+#include <cctype>
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <vector>
 #include <SDL.h>
 
@@ -11,8 +14,62 @@ enum class app_action {
     none,
     next,
     previous,
+    save,
     quit,
 };
+
+std::string sanitize_filename(const char* name) {
+    std::string input = name ? name : "image";
+    std::string out;
+    out.reserve(input.size());
+    for (unsigned char ch : input) {
+        if (std::isalnum(ch) || ch == '-' || ch == '_') {
+            out.push_back(static_cast<char>(ch));
+        } else {
+            out.push_back('_');
+        }
+    }
+    if (out.empty()) {
+        out = "image";
+    }
+    return out;
+}
+
+bool save_pixels_as_bmp(const char* renderer_name, const std::vector<uint8_t>& pixels, int width, int height) {
+    if (width <= 0 || height <= 0 || pixels.size() != static_cast<size_t>(width * height * 3)) {
+        std::cerr << "Save failed: invalid image buffer size.\n";
+        return false;
+    }
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormatFrom(
+        const_cast<uint8_t*>(pixels.data()),
+        width,
+        height,
+        24,
+        width * 3,
+        SDL_PIXELFORMAT_RGB24);
+
+    if (!surface) {
+        std::cerr << "SDL_CreateRGBSurfaceWithFormatFrom Error: " << SDL_GetError() << '\n';
+        return false;
+    }
+
+    static int save_counter = 1;
+    std::ostringstream filename;
+    filename << sanitize_filename(renderer_name) << "_" << save_counter++ << ".bmp";
+
+    const std::string path = filename.str();
+    const int rc = SDL_SaveBMP(surface, path.c_str());
+    SDL_FreeSurface(surface);
+
+    if (rc != 0) {
+        std::cerr << "SDL_SaveBMP Error: " << SDL_GetError() << '\n';
+        return false;
+    }
+
+    std::cout << "Saved image: " << path << '\n';
+    return true;
+}
 
 app_action poll_action(bool wait_for_event) {
     SDL_Event event;
@@ -39,6 +96,13 @@ app_action poll_action(bool wait_for_event) {
 
             if (event.button.button == SDL_BUTTON_RIGHT) {
                 return app_action::previous;
+            }
+        }
+
+        if (event.type == SDL_KEYDOWN) {
+            const bool ctrl_down = (event.key.keysym.mod & KMOD_CTRL) != 0;
+            if (ctrl_down && event.key.keysym.sym == SDLK_s) {
+                return app_action::save;
             }
         }
     } while (SDL_PollEvent(&event));
@@ -93,11 +157,17 @@ app_action render_image(
 
     SDL_SetWindowTitle(window, entry.name);
     pixels.assign(image_width * image_height * 3, 0);
+    bool save_requested_during_render = false;
 
     for (int j = 0; j < image_height; j++) {
         std::clog << "\r[" << entry.name << "] Scanlines remaining: " << (image_height - j) << ' ' << std::flush;
 
         app_action action = poll_action(false);
+        if (action == app_action::save) {
+            save_requested_during_render = true;
+            action = app_action::none;
+        }
+
         if (action != app_action::none) {
             return action;
         }
@@ -113,6 +183,10 @@ app_action render_image(
         SDL_RenderClear(renderer);
         SDL_RenderCopy(renderer, texture, nullptr, nullptr);
         SDL_RenderPresent(renderer);
+    }
+
+    if (save_requested_during_render) {
+        save_pixels_as_bmp(entry.name, pixels, image_width, image_height);
     }
 
     std::clog << "\r[" << entry.name << "] Done.                 \n";
@@ -186,6 +260,17 @@ int main(int argc, char* argv[]) {
             if (action == app_action::quit) {
                 current_renderer = -1;
                 break;
+            }
+
+            if (action == app_action::save) {
+                int w = 0;
+                int h = 0;
+                if (texture && SDL_QueryTexture(texture, nullptr, nullptr, &w, &h) == 0) {
+                    save_pixels_as_bmp(renderers[current_renderer].name, pixels, w, h);
+                } else {
+                    std::cerr << "Save failed: no active rendered image.\n";
+                }
+                continue;
             }
 
             if (action == app_action::next) {
