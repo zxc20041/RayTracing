@@ -31,6 +31,21 @@
       "problemMatcher": [
         "$msCompile"
       ]
+    },
+    {
+      "label": "CMake Build (Release)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build",
+        "--config",
+        "Release"
+      ],
+      "dependsOn": "CMake Configure",
+      "problemMatcher": [
+        "$msCompile"
+      ]
     }
   ]
 }

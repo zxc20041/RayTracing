@@ -34,8 +34,8 @@ color image23_ray_color(const ray& r, const hittable& world, int depth) {
 render_scene create_image23_scene() {
     render_scene scene;
     scene.cam.aspect_ratio      = 16.0f / 9.0f;
-    scene.cam.image_width       = 1000;
-    scene.cam.samples_per_pixel = 100;
+    scene.cam.image_width       = 1280;
+    scene.cam.samples_per_pixel = 500;
     scene.cam.max_depth         = 50;
 
     scene.cam.enable_gamma_correction = true;
