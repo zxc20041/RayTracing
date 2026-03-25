@@ -59,6 +59,6 @@ Or press **F5** in VS Code to build (Debug) and launch directly.
 ## Adding a new image
 
 1. Create `image_render/imageN.cpp` and implement `imageN_spec()` + `fill_imageN_scanline()`.
-2. Add a self-registration block at the end of the file (copy the pattern from `image4.cpp`).
+2. Add a self-registration block at the end of the file (copy the pattern from `image22.cpp`).
 3. Declare the two functions in `image_render/image_render.h`.
 4. Add `image_render/imageN.cpp` to `CMakeLists.txt`.
